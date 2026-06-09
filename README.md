@@ -1,6 +1,6 @@
 # 🐹 Gruniożerca Saturn
 
-**Gruniożerca Saturn** to homebrewowy port klasycznej gry NES z świnką morską łapiącą spadające marchewki. Stworzony przy użyciu [Jo Engine](https://github.com/johannes-fetz/joengine) i przetestowany na prawdziwym sprzęcie Sega Saturn przez kartę flash SArO.
+**Gruniożerca Saturn** to homebrewowy port klasycznej gry NES z świnką morską łapiącą spadające marchewki. Stworzony przy użyciu [Jo Engine](https://github.com/johannes-fetz/joengine) i przetestowany na prawdziwym sprzęcie Sega Saturn przez kartę flash SAROO.
 
 ![Sega Saturn](https://img.shields.io/badge/Platforma-Sega%20Saturn-blue)
 ![Jo Engine](https://img.shields.io/badge/SDK-Jo%20Engine-green)
@@ -10,7 +10,7 @@
 
 ## 📋 Opis
 
-Projekt jest wiernym portem Gruniożerki (znanej z NES) na Segę Saturn. Gracz steruje świnką morską (Grunio), przemieszczając się w lewo i prawo, zmieniając kolor przyciskami A/B i łapiąc spadające marchewki, które pasują do jego koloru, aby zdobywać punkty.
+Projekt jest (dość prymitywnym) portem gry Gruniożerca znanej z NES na Segę Saturn. Gracz steruje świnką morską (Grunio), przemieszczając się w lewo i prawo, zmieniając kolor przyciskami A/B i łapiąc spadające marchewki, które pasują do jego koloru, aby zdobywać punkty. Port w obecnym stanie wykorzystuje ułamek mocy Saturna i powstał jako eksperyment dla zabawy jak daleko można popchnąć lokalny model Ai i czy poradzi sobie ze skomplikowaną archtekturą Saturna. Gra uruchamia się faktycznie na fizycznym sprzęcie, więc eksperyment się udał.
 
 **Podziękowania:**
 - **Oryginalna gra NES:** [arhneu/gruniozerca](https://github.com/arhneu/gruniozerca) — referencyjna implementacja i design gry
@@ -43,7 +43,7 @@ Projekt jest wiernym portem Gruniożerki (znanej z NES) na Segę Saturn. Gracz s
 
 ### Sprzęt
 - **Sega Saturn** — dual SH2 CPUs, VDP1 (sprite'y), VDP2 (tło/tekst)
-- **Karta flash SArO** — format BIN+CUE (Mode 1/2352), karta SD w FAT32/exFAT
+- **Karta flash SAROO** — format BIN+CUE (Mode 1/2352), karta SD w FAT32/exFAT
 
 ### Silnik
 - **Jo Engine** — open-source'owy SDK 2D/3D do Segi Saturna
@@ -88,10 +88,7 @@ gruniozerca-saturn/
 │       └── game.cue           # Karta CUE
 ├── iso2saturn.sh              # Konwerter ISO → BIN+CUE (2048 → 2352 SECDATA)
 ├── SATURN_LIMITS.md           # Referencja ograniczeń sprzętowych
-├── STATUS.md                  # Status aktualnego rozwoju
-├── PLAN.md                    # Plan funkcji
-├── DESIGN_REFERENCE.md        # Analiza oryginału NES
-└── TEST_WORKFLOW.md           # Pipeline budowy → deploy → weryfikacja
+├── README.md
 ```
 
 ## 🛠️ Budowanie
@@ -110,7 +107,7 @@ make clean && make -j$(nproc)
 
 Generuje to plik `game.iso` w katalogu projektu.
 
-### Konwersja dla SArO (prawdziwa Saturn)
+### Konwersja dla .bin .cue żeby startowało na SAROO
 
 ```bash
 ./iso2saturn.sh JoEngine-src/Projects/gruniozerca/game.iso
