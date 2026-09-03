@@ -1,8 +1,8 @@
 # Gruniożerca Saturn - Current Status
 
-> Updated: 2026-09-03 10:55 UTC  
+> Updated: 2026-09-03 12:15 UTC  
 > Maintainer: GLaDOS  
-> Status: **Tier 19 — Finalne SFX ✅ + High Score ✅ (kod, czeka test sprzętowy)**
+> Status: **Tier 19 — Finalne SFX ✅ + High Score z obsługa błędów ✅ (czeka test sprzętowy)**
 
 ---
 
@@ -25,13 +25,13 @@
 - **Dźwięk SCSP (Tier 18/19):** `CATCH.PCM`, `MISS.PCM`, `CHGCOL.PCM`, `GAMEOVR.PCM` (32kHz mono 16-bit, FINALNE — tonalne, zsyntezowane przez `sfx_generator.py`, zaakceptowane odsłuchowo 03.09)
   - Catch → harmoniczny ding 0.2s; Miss → brzęk 0.3s; CHGCOL → chirp 0.1s; GAMEOVR → kaskada 4 tonów 1.0s
   - Catch → poprawny kolor; Miss → błąd/pudło; Color Change → A/B cooldown 10 klatek; Game Over → śmierć
-- **High score (Tier 19):** `jo_backup` plik `GRUNIO` w internal backup RAM, zapis przy game over, HIGH na title/game over (`BACKUP_MODULE=1`) — KOD GOTOWY, nie testowany na sprzęcie (node .44 offline 03.09)
+- **High score (Tier 19):** `jo_backup` plik `GRUNIO` (4 B, 1 blok) w internal backup RAM, zapis przy game over tylko przy bicia rekordu, HIGH na title/game over (`BACKUP_MODULE=1`). Obsługa błędów (be6b9c4): `backup_ok` z mounta, komunikaty na GAME OVER: NEW RECORD SAVED! / MEMORY FULL! / SAVE FAILED! — KOD GOTOWY, nie testowany na sprzęcie (node .44 offline 03.09)
 
 ## ❌ What Doesn't Work (Yet)
 
 - **Debug ghosting** — akceptowalny kompromis
 - **High score — weryfikacja na sprzęcie** (boot z BACKUP_MODULE, zapis/odczyt po resecie); podejrzenie ryzyka: jeśli boot wisi, pierwszy podejrzany jo_backup
-- **Release v0.1 (Draft)** — zawiera STARE ISO z szumowymi SFX; odświeżyć assety po pushu
+- **Release v0.1 (Draft)** — zawiera STARE ISO z szumowymi SFX; odświeżyć assety po potwierdzeniu boota (potrzebny token GitHub do API)
 
 ## 📄 Dokumentacja
 
@@ -41,7 +41,7 @@
 
 ## 🎯 Next Steps
 
-1. **Test na sprzęcie/emulatorze** (node `.44`, kiedy Łukasz go odpali): boot + high score save/load przez reset + SFX w akcji
+1. **Test na sprzęcie/emulatorze** (node `.44`, kiedy Łukasz go odpali): boot + SFX w akcji + high score full flow (rekord → NEW RECORD SAVED → reset → HIGH na title; ew. MEMORY FULL przy zapchanej pamięci)
 2. **Odświeżyć Draft release v0.1** — nowe ISO (743 KB, 03.09) z finalnymi PCM
 3. **Tier 20 (polish)** — do omówienia: carrot falling animation, explosion FX, ground art, lepszy RNG
 
