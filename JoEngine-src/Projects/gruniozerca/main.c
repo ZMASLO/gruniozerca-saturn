@@ -35,6 +35,8 @@ int         frame_tick;
 int         score;
 int         lives;
 static int  high_score = 0;
+static int  backup_ok = 0;       // internal backup RAM zamontowany?
+static int  save_status = 0;     // 0=brak rekordu, 1=zapisano, 2=brak miejsca, 3=blad pamieci
 int         facing_right = 1;
 static int  debug_mode = 0;
 
@@ -98,7 +100,7 @@ static jo_color color_vdp2[COLOR_COUNT] = {
 static void respawn_carrot(void);
 static void reset_game(void);
 static void load_high_score(void);
-static void save_high_score(void);
+static int  save_high_score(void);
 static void draw_background_elements(void);
 
 static void draw_background_elements(void)
@@ -134,9 +136,11 @@ static void load_high_score(void)
     }
 }
 
-static void save_high_score(void)
+static int save_high_score(void)
 {
-    jo_backup_save_file_contents(JoInternalMemoryBackup, "GRUNIO", "HI", &high_score, sizeof(high_score));
+    if (!backup_ok) return 3;    // brak sprawnej pamieci (bateria/brak formatu) - nie probujemy
+    return jo_backup_save_file_contents(JoInternalMemoryBackup, "GRUNIO", "HI", &high_score, sizeof(high_score))
+               ? 1 : 2;          // false = pelna pamiec / blad zapisu
 }
 
 static void respawn_carrot(void)
@@ -216,6 +220,7 @@ static void reset_game(void)
     move_timeout      = 0;
     color_snd_cooldown = 0;
     popup_count = 0;
+    save_status  = 0;
     game_state   = STATE_PLAYING;
     respawn_carrot();
     jo_clear_screen();
@@ -244,16 +249,19 @@ static void draw_pause_screen(void)
 
 static void draw_game_over(void)
 {
+    // Save high score on game over (jednorazowo: po zapisie high_score == score)
+    if (score > high_score) {
+        high_score = score;
+        save_status = save_high_score();
+    }
+
     jo_printf(15, 10, "GAME  OVER");
     jo_printf(12, 12, "SCORE: %07d", score);
     jo_printf(12, 14, "HIGH: %07d", high_score);
-    jo_printf(10, 16, "PRESS START TO PLAY");
-
-    // Save high score on game over
-    if (score > high_score) {
-        high_score = score;
-        save_high_score();
-    }
+    if (save_status == 1)      jo_printf(11, 16, "NEW RECORD SAVED!");
+    else if (save_status == 2) jo_printf(12, 16, "MEMORY FULL!");
+    else if (save_status == 3) jo_printf(12, 16, "SAVE FAILED!");
+    jo_printf(10, 18, "PRESS START TO PLAY");
 
     if (jo_is_pad1_key_down(JO_KEY_START) || jo_is_pad1_key_down(JO_KEY_A)) {
         reset_game();
@@ -490,8 +498,8 @@ void        jo_main(void)
     }
 
     // Mount internal backup memory and load high score
-    jo_backup_mount(JoInternalMemoryBackup);
-    load_high_score();
+    backup_ok = jo_backup_mount(JoInternalMemoryBackup) ? 1 : 0;
+    if (backup_ok) load_high_score();
 
     game_state = STATE_TITLE;
 
