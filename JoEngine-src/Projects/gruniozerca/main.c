@@ -34,6 +34,7 @@ Color       carrot_color;
 int         frame_tick;
 int         score;
 int         lives;
+static int  high_score = 0;
 int         facing_right = 1;
 static int  debug_mode = 0;
 
@@ -96,6 +97,8 @@ static jo_color color_vdp2[COLOR_COUNT] = {
 
 static void respawn_carrot(void);
 static void reset_game(void);
+static void load_high_score(void);
+static void save_high_score(void);
 static void draw_background_elements(void);
 
 static void draw_background_elements(void)
@@ -120,6 +123,20 @@ static void draw_background_elements(void)
         jo_draw_background_square(x, y, 6, 2, red);   // poziomo
         jo_draw_background_square(x + 2, y + 2, 2, 6, red); // pionowo
     }
+}
+
+static void load_high_score(void)
+{
+    unsigned int len = 0;
+    int *loaded = (int *)jo_backup_load_file_contents(JoInternalMemoryBackup, "GRUNIO", &len);
+    if (loaded != JO_NULL && len == sizeof(high_score)) {
+        high_score = *loaded;
+    }
+}
+
+static void save_high_score(void)
+{
+    jo_backup_save_file_contents(JoInternalMemoryBackup, "GRUNIO", "HI", &high_score, sizeof(high_score));
 }
 
 static void respawn_carrot(void)
@@ -208,6 +225,7 @@ static void draw_title_screen(void)
 {
     jo_printf(8, 10, "GRUNIOZERCA");
     jo_printf(10, 15, "PRESS START TO PLAY");
+    jo_printf(12, 17, "HIGH: %07d", high_score);
 
     if (jo_is_pad1_key_down(JO_KEY_START) || jo_is_pad1_key_down(JO_KEY_A)) {
         reset_game();
@@ -228,7 +246,14 @@ static void draw_game_over(void)
 {
     jo_printf(15, 10, "GAME  OVER");
     jo_printf(12, 12, "SCORE: %07d", score);
-    jo_printf(10, 15, "PRESS START TO PLAY");
+    jo_printf(12, 14, "HIGH: %07d", high_score);
+    jo_printf(10, 16, "PRESS START TO PLAY");
+
+    // Save high score on game over
+    if (score > high_score) {
+        high_score = score;
+        save_high_score();
+    }
 
     if (jo_is_pad1_key_down(JO_KEY_START) || jo_is_pad1_key_down(JO_KEY_A)) {
         reset_game();
@@ -463,6 +488,10 @@ void        jo_main(void)
         snd_game_over.sample_rate = 32000;
         snd_game_over.volume = 100;
     }
+
+    // Mount internal backup memory and load high score
+    jo_backup_mount(JoInternalMemoryBackup);
+    load_high_score();
 
     game_state = STATE_TITLE;
 

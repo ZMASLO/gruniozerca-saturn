@@ -2,6 +2,7 @@ JoEngine-src/Compiler/
 JoEngine-src/Emulators/
 JoEngine-src/Samples/
 JoEngine-src/Tools/
+JoEngine-src/jo_engine/
 
 *.o *.elf *.raw *.map *.iso *.cue *.bin *.idl
 0.bin
